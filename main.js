@@ -96,9 +96,10 @@ if (CONFIG.enableWebVR && navigator.xr && navigator.xr.isSessionSupported) {
 }
 
 // ---- マーカーAR（ar-marker.html）への導線ボタン ----
-// WebXR とは独立した仕組み（AR.js＝カメラ映像＋マーカー認識）のため、対応端末チェックは不要。
-// iOS Safari を含むほとんどの端末で動作するので、config で有効なら常に表示する。
-if (CONFIG.markerAR && CONFIG.markerAR.enableButton) {
+// AR.js（カメラ映像＋マーカー認識）を使うため、背面カメラを持つモバイル端末での機能とする。
+// PC等（マウス操作＝pointer: fine）では意味をなさないので、タッチ端末のみ表示する。
+const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+if (CONFIG.markerAR && CONFIG.markerAR.enableButton && isTouchDevice) {
     const markerArBtn = document.getElementById('marker-ar-btn');
     if (markerArBtn) markerArBtn.style.display = '';
 }
