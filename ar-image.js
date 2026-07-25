@@ -8,18 +8,25 @@
 // ============================================================
 const CONFIG   = VIEWER_CONFIG;
 const IMG      = CONFIG.imageAR || {};
+const ARUI     = CONFIG.arUI || {};
 const arRoot   = document.getElementById('ar-root');
 const hint     = document.getElementById('ar-hint');
 const setup    = document.getElementById('ar-setup');
+const showHint = ARUI.showHint !== false;
 
-// ---- モード切り替えボタンの表示可否 ----
-// （このページ自体は画像ARなので、マーカーARへ戻す導線のみ enableButton で制御）
+// ---- 画面上のUIの表示・非表示（config の arUI で切り替え） ----
+// 戻るボタン（既定で表示。showBackButton が false のときだけ隠す）
+const backBtn = document.getElementById('back-btn');
+if (backBtn && ARUI.showBackButton === false) backBtn.style.display = 'none';
+
+// モード切り替え（マーカーARへ）ボタン（既定で表示。showModeSwitchButton が false のときだけ隠す）
 const switchMarkerBtn = document.getElementById('switch-marker-btn');
-if (switchMarkerBtn && CONFIG.markerAR && CONFIG.markerAR.enableButton === false) {
+if (switchMarkerBtn && ARUI.showModeSwitchButton === false) {
     switchMarkerBtn.style.display = 'none';
 }
 
 // ---- 記述子が未設定なら、案内だけ表示して終了 ----
+// （セットアップ案内は showHint とは独立に表示する。設定がないと画像ARが機能しないため）
 if (!IMG.descriptorName) {
     hint.classList.add('hidden');
     setup.classList.remove('hidden');
@@ -82,8 +89,10 @@ function buildImageAR(descriptorName) {
         });
     }
 
-    // ---- 画像検出状態に応じて案内の表示を切り替える ----
-    if (nft) {
+    // ---- 画像検出状態に応じて案内の表示を切り替える（showHint が false なら常に非表示） ----
+    if (!showHint) {
+        hint.classList.add('hidden');
+    } else if (nft) {
         nft.addEventListener('markerFound', () => hint.classList.add('hidden'));
         nft.addEventListener('markerLost',  () => hint.classList.remove('hidden'));
     }
@@ -91,6 +100,7 @@ function buildImageAR(descriptorName) {
 
 // ---- カメラ利用の失敗時の案内 ----
 window.addEventListener('camera-init-error', () => {
+    if (!showHint) return;
     document.getElementById('ar-hint-text').textContent = 'カメラを開始できませんでした（権限を許可し、https でアクセスしてください）';
     hint.classList.remove('hidden');
 });

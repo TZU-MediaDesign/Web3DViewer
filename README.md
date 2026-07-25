@@ -60,6 +60,8 @@ A-Frame を用いたブラウザ上の3Dモデルビューアです。ドラッ�
 | `autoOrbit` | 無操作時の自動回転の速さ・上下の揺れ幅（`speedMinDeg` / `speedMaxDeg` / `verticalRangeDeg` / `verticalSpeedMaxDeg`） |
 | `xrCameraPosition` | WebXRのAR/VRモードに入ったときの視点の開始位置 |
 | `markerAR` | マーカー型AR（`ar-marker.html`）の設定（後述の「マーカー型AR」節を参照） |
+| `imageAR` | 画像トラッキング型AR（`ar-image.html`）の設定（後述の「画像トラッキング（NFT）」節を参照） |
+| `arUI` | AR画面のボタン類（戻る／モード切替／案内）の表示・非表示（後述の「AR画面のUI表示」節を参照） |
 
 自分の3Dモデルを表示する場合は、`Assets` フォルダにモデルファイル（`.gltf`とその関連ファイル、または`.glb`）を配置し、`config.js` の `modelFile` をそのファイル名に変更してください。
 
@@ -111,6 +113,16 @@ A-Frame を用いたブラウザ上の3Dモデルビューアです。ドラッ�
 
 > [!NOTE]
 > マーカー型（`aframe-ar.js`）と画像型（`aframe-ar-nft.js`）は**排他的な別ビルド**で同じページに同居できないため、`ar-marker.html` と `ar-image.html` の2ページに分け、ボタンで切り替える構成にしています。
+
+### AR画面のUI表示（`config.js` の `arUI`）
+
+AR画面（`ar-marker.html` / `ar-image.html`）に重ねて表示するボタン類は、`config.js` の `arUI` で表示・非表示を切り替えられます。展示レイアウトに合わせて隠せます。
+
+| `arUI` の設定 | 説明 |
+| --- | --- |
+| `showBackButton` | 「戻る」ボタン（通常ビューアに戻る）を表示するか |
+| `showModeSwitchButton` | モード切り替えボタン（マーカーAR ↔ 画像AR）を表示するか |
+| `showHint` | 画面上部の操作案内テキスト（「マーカーにカメラを向けてください」等）を表示するか |
 
 > [!TIP]
 > NFTはマーカー型より認識が不安定で、端末の負荷も高めです。展示で確実性を優先する場合は、まずマーカー型での運用をおすすめします。
