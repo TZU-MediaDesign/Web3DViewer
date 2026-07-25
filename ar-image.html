@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>画像AR - 3D Model Viewer</title>
+
+    <!-- AR.js（画像トラッキング / NFT）は A-Frame 1.6.0 が必要。マーカー型(aframe-ar.js)とは
+         排他的な別ビルド(aframe-ar-nft.js)のため、ページを分けています。 -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
+    <script src="config.js"></script>
+
+    <link rel="stylesheet" href="ar.css">
+</head>
+<body>
+    <!-- 記述子(descriptorName)が設定されている場合のみ、ar-image.js が下記に a-scene を組み立てます。
+         未設定の場合はセットアップ手順の案内だけを表示します（カメラは起動しません）。 -->
+    <div id="ar-root"></div>
+
+    <!-- 画面上部：画像未検出時 or セットアップ案内 -->
+    <div id="ar-hint">
+        <div id="ar-hint-text">対象の画像にカメラを向けてください</div>
+    </div>
+
+    <!-- 記述子未設定時のセットアップ案内 -->
+    <div id="ar-setup" class="hidden">
+        <div id="ar-setup-inner">
+            <h1>画像ARの準備が必要です</h1>
+            <p>認識したい画像を「記述子ファイル（.fset / .fset3 / .iset）」に変換し、<code>Assets</code> フォルダに置いたうえで、<code>config.js</code> の <code>imageAR.descriptorName</code> にその名前を設定してください。</p>
+            <p>生成手順は README「画像トラッキング（NFT）」の節を参照してください。</p>
+        </div>
+    </div>
+
+    <!-- 右下：モード切り替え／戻るボタン -->
+    <div id="ar-btn-group">
+        <a id="switch-marker-btn" href="ar-marker.html" title="マーカーARに切り替え">
+            <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm12 2h4v4h-4v-4zm-2-2h2v2h-2v-2z" fill="#fff"/></svg>
+            <span class="ar-btn-label">マーカー</span>
+        </a>
+        <a id="back-btn" href="index.html" title="通常ビューアに戻る">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="ar-btn-label">戻る</span>
+        </a>
+    </div>
+
+    <script src="ar-image.js"></script>
+</body>
+</html>
+
+
+<!-- MIT License | github.com/ChikumaTateshina/Web3DViewer -->

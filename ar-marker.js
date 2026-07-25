@@ -10,6 +10,12 @@ const arModel   = document.getElementById('ar-model');
 const hint      = document.getElementById('ar-hint');
 const hintText  = document.getElementById('ar-hint-text');
 
+// ---- 「画像ARに切り替え」ボタンの表示可否（config の imageAR.enableButton） ----
+const switchImageBtn = document.getElementById('switch-image-btn');
+if (switchImageBtn && CONFIG.imageAR && CONFIG.imageAR.enableButton) {
+    switchImageBtn.style.display = '';
+}
+
 // ---- マーカーの種類を設定 ----
 // "hiro"（標準）/ "barcode"（番号）/ "pattern"（自作 .patt）
 if (AR.markerType === 'pattern' && AR.patternFile) {

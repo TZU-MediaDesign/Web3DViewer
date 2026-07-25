@@ -1,5 +1,5 @@
-/* マーカー型AR（ar-marker.html）専用スタイル */
-body { margin: 0; overflow: hidden; }
+/* マーカー型AR（ar-marker.html）／画像型AR（ar-image.html）共通スタイル */
+body { margin: 0; overflow: hidden; background: #12181f; }
 
 /* A-Frame が既定で挿入する VR/AR 突入ボタンや通知モーダルを隠す（自前UIに統一するため） */
 .a-enter-vr,
@@ -32,6 +32,39 @@ body { margin: 0; overflow: hidden; }
 }
 #ar-hint.hidden {
     opacity: 0;
+}
+
+/* 画像AR（ar-image.html）で記述子が未設定のときのセットアップ案内 */
+#ar-setup {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #12181f;
+    z-index: 90;
+}
+#ar-setup.hidden { display: none; }
+#ar-setup-inner {
+    max-width: 520px;
+    color: #e8edf2;
+    font-family: sans-serif;
+    line-height: 1.7;
+}
+#ar-setup-inner h1 {
+    font-size: 18px;
+    margin: 0 0 16px;
+}
+#ar-setup-inner p {
+    font-size: 14px;
+    margin: 0 0 12px;
+}
+#ar-setup-inner code {
+    background: rgba(255, 255, 255, 0.12);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 13px;
 }
 
 /* 右下：戻る／モード切り替えボタン */
