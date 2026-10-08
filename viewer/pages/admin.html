@@ -1,0 +1,40 @@
+<!-- boot.js が各モデルのページの <body> に挿入する断片です（単体では開きません） -->
+<div id="admin">
+    <aside id="panel">
+        <header id="panel-head">
+            <h1>設定</h1>
+            <div id="model-path"></div>
+        </header>
+
+        <div id="form"></div>
+
+        <details id="dest">
+            <summary>保存先（GitHub）</summary>
+            <p class="note">
+                「GitHubに保存」を押すと、このモデルの <code>config.json</code> をリポジトリに直接コミットします。
+                保存には、このリポジトリの <b>Contents: Read and write</b> 権限を持つアクセストークンが必要です
+                （<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHubで発行</a>）。
+            </p>
+            <label class="field"><span>ユーザー / 組織名</span><input type="text" id="gh-owner" autocomplete="off"></label>
+            <label class="field"><span>リポジトリ名</span><input type="text" id="gh-repo" autocomplete="off"></label>
+            <label class="field"><span>ブランチ</span><input type="text" id="gh-branch" autocomplete="off"></label>
+            <label class="field"><span>ファイルのパス</span><input type="text" id="gh-path" autocomplete="off"></label>
+            <label class="field"><span>アクセストークン</span><input type="password" id="gh-token" autocomplete="off"></label>
+            <label class="check"><input type="checkbox" id="gh-remember"><span>トークンをこの端末のブラウザに記憶する</span></label>
+        </details>
+
+        <footer id="panel-foot">
+            <div id="status" role="status"></div>
+            <div id="actions">
+                <button type="button" id="save-btn" class="primary">GitHubに保存</button>
+                <button type="button" id="download-btn">書き出し</button>
+                <button type="button" id="revert-btn">元に戻す</button>
+            </div>
+        </footer>
+    </aside>
+
+    <main id="stage">
+        <iframe id="preview" title="プレビュー"></iframe>
+        <a id="open-link" target="_blank" rel="noopener">公開ページを開く</a>
+    </main>
+</div>

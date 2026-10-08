@@ -1,0 +1,11 @@
+{
+  "pageTitle": "3D Model Viewer",
+  "displayTitle": ["Sample Model", "3D Model Viewer"],
+  "modelFile": "index.gltf",
+  "backgroundType": "color",
+  "backgroundColor": "#8FA8BF",
+  "fogColor": "#8FA8BF",
+  "fogNear": 60,
+  "fogFar": 120,
+  "cameraHome": { "px": 20, "py": 20, "pz": 15, "tx": 0, "ty": 2, "tz": 0 }
+}

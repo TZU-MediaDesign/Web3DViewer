@@ -3,17 +3,13 @@
 
 !/.gitignore
 !/index.html
-!/style.css
-!/main.js
-!/config.js
+!/models.json
 !/README.md
 !/LICENSE
 
-!/ar-marker.html
-!/ar-marker.js
-!/ar-image.html
-!/ar-image.js
-!/ar.css
+# 共通のビューア本体（viewer/）と、各モデルのフォルダ（<モデル名>/）は中身ごと公開する
+!/*/
+!/*/**
 
-!/Assets/
-!/Assets/**
+/.claude/
+.DS_Store

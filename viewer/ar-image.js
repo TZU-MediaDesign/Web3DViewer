@@ -6,7 +6,8 @@
 // 記述子（imageAR.descriptorName）が未設定の場合は、AR/カメラを起動せず、
 // セットアップ手順の案内だけを表示します。
 // ============================================================
-const CONFIG   = VIEWER_CONFIG;
+const CONFIG   = window.VIEWER_CONFIG;
+const ROOT     = window.W3DV_ENV.MODEL_ROOT;
 const IMG      = CONFIG.imageAR || {};
 const ARUI     = CONFIG.arUI || {};
 const arRoot   = document.getElementById('ar-root');
@@ -17,10 +18,12 @@ const showHint = ARUI.showHint !== false;
 // ---- 画面上のUIの表示・非表示（config の arUI で切り替え） ----
 // 戻るボタン（既定で表示。showBackButton が false のときだけ隠す）
 const backBtn = document.getElementById('back-btn');
+if (backBtn) backBtn.href = ROOT;
 if (backBtn && ARUI.showBackButton === false) backBtn.style.display = 'none';
 
 // モード切り替え（マーカーARへ）ボタン（既定で表示。showModeSwitchButton が false のときだけ隠す）
 const switchMarkerBtn = document.getElementById('switch-marker-btn');
+if (switchMarkerBtn) switchMarkerBtn.href = `${ROOT}ar-marker/`;
 if (switchMarkerBtn && ARUI.showModeSwitchButton === false) {
     switchMarkerBtn.style.display = 'none';
 }
@@ -57,14 +60,14 @@ function buildImageAR(descriptorName) {
             <a-nft
                 id="nft"
                 type="nft"
-                url="Assets/${descriptorName}"
+                url="${ROOT}Assets/${descriptorName}"
                 smooth="true"
                 smoothCount="10"
                 smoothTolerance="0.01"
                 smoothThreshold="5">
                 <a-entity
                     id="ar-model"
-                    gltf-model="Assets/${CONFIG.modelFile}"
+                    gltf-model="${ROOT}Assets/${CONFIG.modelFile}"
                     position="${p.x} ${p.y} ${p.z}"
                     rotation="${r.x} ${r.y} ${r.z}"
                     scale="${s.x} ${s.y} ${s.z}"${animAttr}></a-entity>

@@ -4,124 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Model Viewer</title>
-
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-orbit-controls@1.3.2/dist/aframe-orbit-controls.min.js"></script>
-    <script src="https://unpkg.com/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
-    <script src="config.js"></script>
-
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #12181f;
+            color: #e8edf2;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+        main { width: 100%; max-width: 560px; padding: 48px 20px; box-sizing: border-box; }
+        h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.05em; margin: 0 0 24px; }
+        ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+        a {
+            display: block;
+            padding: 16px 18px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            color: inherit;
+            text-decoration: none;
+        }
+        a:hover { background: rgba(255, 255, 255, 0.14); }
+        .name { font-size: 15px; }
+        .path { font-size: 12px; opacity: 0.6; margin-top: 4px; }
+        #message { font-size: 14px; opacity: 0.7; }
+    </style>
 </head>
 <body>
-    <a-scene
-        id="scene"
-        background="color: #8FA8BF"
-        renderer="antialias: true; colorManagement: true; exposure: 1.05; toneMapping: ACESFilmic"
-        fog="type: linear; color: #8FA8BF; near: 60; far: 120"
-        vr-mode-ui="enabled: false; enterVRButton: none; enterARButton: none">
+    <main>
+        <h1>3D Model Viewer</h1>
+        <ul id="list"></ul>
+        <p id="message"></p>
+    </main>
 
-        <a-assets></a-assets>
+    <script>
+        // models.json に並べたモデルのフォルダを一覧表示する。
+        // モデルが1つだけの場合は、一覧を挟まずそのモデルのページへ移動する。
+        (async function () {
+            // 表示を固定中のタブ（viewer/lock.js）では、固定したページへ戻す
+            try {
+                const lock = JSON.parse(sessionStorage.getItem('w3dv-lock'));
+                if (lock) { location.replace(lock.url); return; }
+            } catch (e) { /* 固定されていない */ }
 
-        <a-sky id="sky" visible="false" material="fog: false"></a-sky>
+            const list = document.getElementById('list');
+            const message = document.getElementById('message');
+            try {
+                const { models } = await (await fetch('models.json', { cache: 'no-cache' })).json();
+                if (models.length === 1) { location.replace(models[0] + '/'); return; }
+                if (!models.length) { message.textContent = 'モデルが登録されていません。'; return; }
 
-        <a-light type="ambient" color="#D6E8F5" intensity="0.35"></a-light>
-        <a-light type="directional" color="#FFF6EC" intensity="1.05" position="-3 7 5"></a-light>
-        <a-light type="directional" color="#C8DDEF" intensity="0.35" position="5 3 -5"></a-light>
-        <a-light type="directional" color="#FFFFFF" intensity="0.18" position="0 4 -10"></a-light>
+                for (const id of models) {
+                    let title = id;
+                    try {
+                        const cfg = await (await fetch(`${id}/config.json`, { cache: 'no-cache' })).json();
+                        if (cfg.displayTitle && cfg.displayTitle.length) title = cfg.displayTitle.join(' ');
+                        else if (cfg.pageTitle) title = cfg.pageTitle;
+                    } catch (e) { /* 設定が読めないモデルはフォルダ名で表示する */ }
 
-        <a-entity id="model-entity" position="0 0 0" rotation="0 0 0" scale="1 1 1"></a-entity>
-
-        <a-entity id="xr-rig" position="0 0 0">
-            <a-entity id="camera-rig" camera orbit-controls="
-                target: 0 2 0;
-                minDistance: 2;
-                maxDistance: 80;
-                initialPosition: 5 5 15;
-                enableDamping: true;
-                dampingFactor: 0.08;
-                rotateSpeed: 0.6;
-                zoomSpeed: 1.2;
-                enablePan: true;
-                panSpeed: 0.8;
-                enableZoom: true;
-                screenSpacePanning: true;
-                autoRotate: false;
-                autoRotateSpeed: 0.6;
-                minPolarAngle: 8;
-                maxPolarAngle: 172">
-            </a-entity>
-        </a-entity>
-
-    </a-scene>
-
-    <div id="btn-group">
-        <button id="gyro-btn" title="端末の向きで視点操作" style="display:none">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm3.6 3.4-1.9 5.3-5.3 1.9 1.9-5.3 5.3-1.9z"/>
-            </svg>
-        </button>
-        <button id="ar-btn" title="ARで表示" style="display:none">
-            <span class="xr-label">AR</span>
-        </button>
-        <button id="vr-btn" title="VRで表示" style="display:none">
-            <span class="xr-label">VR</span>
-        </button>
-        <a id="marker-ar-btn" href="ar-marker.html" title="マーカーARで表示" style="display:none">
-            <span class="xr-label">AR</span>
-        </a>
-        <button id="anim-btn" title="アニメーションを一時停止" style="display:none">
-            <svg id="icon-pause" viewBox="0 0 24 24">
-                <path d="M8 5h3v14H8V5zm5 0h3v14h-3V5z"/>
-            </svg>
-            <svg id="icon-play" viewBox="0 0 24 24" style="display:none">
-                <path d="M8 5v14l11-7z"/>
-            </svg>
-        </button>
-        <button id="reset-btn" title="視点をリセット">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6a6 6 0 0 1-6 6 6 6 0 0 1-6-6H4a8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8z"/>
-            </svg>
-        </button>
-        <button id="fullscreen-btn" title="全画面表示">
-            <svg id="icon-expand" viewBox="0 0 24 24">
-                <path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 4h-4v2h6v-6h-2v4z"/>
-            </svg>
-            <svg id="icon-collapse" viewBox="0 0 24 24" style="display:none">
-                <path d="M9 3H7v4H3v2h6V3zm6 0h-2v6h6V7h-4V3zM3 13v2h4v4h2v-6H3zm14 6v-4h4v-2h-6v6h2z"/>
-            </svg>
-        </button>
-    </div>
-
-    <div id="loading-overlay">
-        <div id="loading-spinner"></div>
-        <div id="loading-text"></div>
-    </div>
-
-    <div id="title">
-        Sample Exhibition<br>3D Model Viewer
-    </div>
-
-    <div id="bottom-ui">
-        <div id="explore-prompt">
-            <span id="explore-icon">↻</span>
-            <span>自由に操作できます</span>
-        </div>
-
-        <div id="controls-hint">
-            <span class="hint-pc">
-                <span class="hint-phrase">ドラッグ：回転</span>
-                <span class="hint-phrase">右ドラッグ / Ctrl+ドラッグ：移動</span>
-                <span class="hint-phrase">スクロール：ズーム</span>
-            </span>
-            <span class="hint-sp">
-                <span class="hint-phrase">1本指：回転</span>
-                <span class="hint-phrase">2本指ピンチ：ズーム</span>
-                <span class="hint-phrase">2本指スワイプ：移動</span>
-            </span>
-        </div>
-    </div>
-
-    <script src="main.js"></script>
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = id + '/';
+                    const name = document.createElement('div');
+                    name.className = 'name';
+                    name.textContent = title;
+                    const path = document.createElement('div');
+                    path.className = 'path';
+                    path.textContent = id + '/';
+                    a.append(name, path);
+                    li.appendChild(a);
+                    list.appendChild(li);
+                }
+            } catch (e) {
+                message.textContent = 'モデルの一覧（models.json）を読み込めませんでした。';
+            }
+        })();
+    </script>
 </body>
 </html>
 

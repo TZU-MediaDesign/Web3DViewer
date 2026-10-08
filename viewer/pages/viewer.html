@@ -1,0 +1,92 @@
+<!-- boot.js が各モデルのページの <body> に挿入する断片です（単体では開きません） -->
+<a-scene
+    id="scene"
+    background="color: #8FA8BF"
+    renderer="antialias: true; colorManagement: true; exposure: 1.05; toneMapping: ACESFilmic"
+    fog="type: linear; color: #8FA8BF; near: 60; far: 120"
+    vr-mode-ui="enabled: false; enterVRButton: none; enterARButton: none">
+
+    <a-assets></a-assets>
+
+    <a-sky id="sky" visible="false" material="fog: false"></a-sky>
+
+    <a-light type="ambient" color="#D6E8F5" intensity="0.35"></a-light>
+    <a-light type="directional" color="#FFF6EC" intensity="1.05" position="-3 7 5"></a-light>
+    <a-light type="directional" color="#C8DDEF" intensity="0.35" position="5 3 -5"></a-light>
+    <a-light type="directional" color="#FFFFFF" intensity="0.18" position="0 4 -10"></a-light>
+
+    <a-entity id="model-entity" position="0 0 0" rotation="0 0 0" scale="1 1 1"></a-entity>
+
+    <a-entity id="xr-rig" position="0 0 0">
+        <!-- orbit-controls は、設定の初期視野（cameraHome）を使って main.js が付与する -->
+        <a-entity id="camera-rig" camera></a-entity>
+    </a-entity>
+
+</a-scene>
+
+<div id="btn-group">
+    <button id="gyro-btn" title="端末の向きで視点操作" style="display:none">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm3.6 3.4-1.9 5.3-5.3 1.9 1.9-5.3 5.3-1.9z"/>
+        </svg>
+    </button>
+    <button id="ar-btn" title="ARで表示" style="display:none">
+        <span class="xr-label">AR</span>
+    </button>
+    <button id="vr-btn" title="VRで表示" style="display:none">
+        <span class="xr-label">VR</span>
+    </button>
+    <a id="marker-ar-btn" href="#" title="マーカーARで表示" style="display:none">
+        <span class="xr-label">AR</span>
+    </a>
+    <button id="anim-btn" title="アニメーションを一時停止" style="display:none">
+        <svg id="icon-pause" viewBox="0 0 24 24">
+            <path d="M8 5h3v14H8V5zm5 0h3v14h-3V5z"/>
+        </svg>
+        <svg id="icon-play" viewBox="0 0 24 24" style="display:none">
+            <path d="M8 5v14l11-7z"/>
+        </svg>
+    </button>
+    <button id="reset-btn" title="視点をリセット">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6a6 6 0 0 1-6 6 6 6 0 0 1-6-6H4a8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8z"/>
+        </svg>
+    </button>
+    <button id="fullscreen-btn" title="全画面表示">
+        <svg id="icon-expand" viewBox="0 0 24 24">
+            <path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 4h-4v2h6v-6h-2v4z"/>
+        </svg>
+        <svg id="icon-collapse" viewBox="0 0 24 24" style="display:none">
+            <path d="M9 3H7v4H3v2h6V3zm6 0h-2v6h6V7h-4V3zM3 13v2h4v4h2v-6H3zm14 6v-4h4v-2h-6v6h2z"/>
+        </svg>
+    </button>
+</div>
+
+<div id="loading-overlay">
+    <div id="loading-spinner"></div>
+    <div id="loading-text"></div>
+</div>
+
+<div id="title">
+    Sample Exhibition<br>3D Model Viewer
+</div>
+
+<div id="bottom-ui">
+    <div id="explore-prompt">
+        <span id="explore-icon">↻</span>
+        <span>自由に操作できます</span>
+    </div>
+
+    <div id="controls-hint">
+        <span class="hint-pc">
+            <span class="hint-phrase">ドラッグ：回転</span>
+            <span class="hint-phrase">右ドラッグ / Ctrl+ドラッグ：移動</span>
+            <span class="hint-phrase">スクロール：ズーム</span>
+        </span>
+        <span class="hint-sp">
+            <span class="hint-phrase">1本指：回転</span>
+            <span class="hint-phrase">2本指ピンチ：ズーム</span>
+            <span class="hint-phrase">2本指スワイプ：移動</span>
+        </span>
+    </div>
+</div>

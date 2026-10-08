@@ -3,7 +3,8 @@
 // config.js の markerAR 設定に従い、マーカーの種類・表示モデル・
 // モデルの配置を反映します。
 // ============================================================
-const CONFIG    = VIEWER_CONFIG;
+const CONFIG    = window.VIEWER_CONFIG;
+const ROOT      = window.W3DV_ENV.MODEL_ROOT;
 const AR        = CONFIG.markerAR || {};
 const ARUI      = CONFIG.arUI || {};
 const marker    = document.getElementById('marker');
@@ -14,17 +15,19 @@ const hintText  = document.getElementById('ar-hint-text');
 // ---- 画面上のUIの表示・非表示（config の arUI で切り替え） ----
 // 戻るボタン（既定で表示。showBackButton が false のときだけ隠す）
 const backBtn = document.getElementById('back-btn');
+if (backBtn) backBtn.href = ROOT;
 if (backBtn && ARUI.showBackButton === false) backBtn.style.display = 'none';
 
 // モード切り替え（画像ARへ）ボタン（HTML側で既定 display:none。表示指定のときだけ出す）
 const switchImageBtn = document.getElementById('switch-image-btn');
+if (switchImageBtn) switchImageBtn.href = `${ROOT}ar-image/`;
 if (switchImageBtn && ARUI.showModeSwitchButton !== false) switchImageBtn.style.display = '';
 
 // ---- マーカーの種類を設定 ----
 // "hiro"（標準）/ "barcode"（番号）/ "pattern"（自作 .patt）
 if (AR.markerType === 'pattern' && AR.patternFile) {
     marker.setAttribute('type', 'pattern');
-    marker.setAttribute('url', `Assets/${AR.patternFile}`);
+    marker.setAttribute('url', `${ROOT}Assets/${AR.patternFile}`);
     marker.removeAttribute('preset');
 } else if (AR.markerType === 'barcode') {
     marker.setAttribute('type', 'barcode');
@@ -36,7 +39,7 @@ if (AR.markerType === 'pattern' && AR.patternFile) {
 }
 
 // ---- 表示するモデルと、マーカー上での配置 ----
-arModel.setAttribute('gltf-model', `Assets/${CONFIG.modelFile}`);
+arModel.setAttribute('gltf-model', `${ROOT}Assets/${CONFIG.modelFile}`);
 
 const p = AR.modelPosition || { x: 0, y: 0, z: 0 };
 const r = AR.modelRotation || { x: 0, y: 0, z: 0 };

@@ -1,12 +1,15 @@
-// ---- config.js の内容をシーンに反映 ----
-const CONFIG = VIEWER_CONFIG;
-const HOME   = CONFIG.cameraHome;
+// ---- 設定（defaults.js + モデルごとの config.json）の内容をシーンに反映 ----
+// boot.js が設定を読み込み、window.VIEWER_CONFIG / window.W3DV_ENV を用意してからこのファイルを実行する。
+const CONFIG  = window.VIEWER_CONFIG;
+const ROOT    = window.W3DV_ENV.MODEL_ROOT;   // このモデルのフォルダのURL（末尾 /）
+const PREVIEW = window.W3DV_ENV.PREVIEW;      // 管理画面のプレビュー枠の中で動いているか
+const HOME    = CONFIG.cameraHome;
 
 document.title = CONFIG.pageTitle;
 document.getElementById('title').innerHTML = CONFIG.displayTitle.join('<br>');
 
 const modelEntity = document.getElementById('model-entity');
-modelEntity.setAttribute('gltf-model', `Assets/${CONFIG.modelFile}`);
+modelEntity.setAttribute('gltf-model', `${ROOT}Assets/${CONFIG.modelFile}`);
 
 const scene = document.getElementById('scene');
 scene.setAttribute('fog', `type: linear; color: ${CONFIG.fogColor}; near: ${CONFIG.fogNear}; far: ${CONFIG.fogFar}`);
@@ -16,7 +19,7 @@ if (CONFIG.backgroundType === 'image' && CONFIG.backgroundImage) {
     const skyTexture = document.createElement('img');
     skyTexture.setAttribute('id', 'sky-texture');
     skyTexture.setAttribute('crossorigin', 'anonymous');
-    skyTexture.setAttribute('src', `Assets/${CONFIG.backgroundImage}`);
+    skyTexture.setAttribute('src', `${ROOT}Assets/${CONFIG.backgroundImage}`);
     document.querySelector('a-assets').appendChild(skyTexture);
 
     const sky = document.getElementById('sky');
@@ -95,13 +98,16 @@ if (CONFIG.enableWebVR && navigator.xr && navigator.xr.isSessionSupported) {
     }).catch(() => {});
 }
 
-// ---- マーカーAR（ar-marker.html）への導線ボタン ----
+// ---- マーカーAR（<モデル名>/ar-marker/）への導線ボタン ----
 // AR.js（カメラ映像＋マーカー認識）を使うため、背面カメラを持つモバイル端末での機能とする。
 // PC等（マウス操作＝pointer: fine）では意味をなさないので、タッチ端末のみ表示する。
 const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
 if (CONFIG.markerAR && CONFIG.markerAR.enableButton && isTouchDevice) {
     const markerArBtn = document.getElementById('marker-ar-btn');
-    if (markerArBtn) markerArBtn.style.display = '';
+    if (markerArBtn) {
+        markerArBtn.href = `${ROOT}ar-marker/`;
+        markerArBtn.style.display = '';
+    }
 }
 
 // ---- AR/VRモードに入ったときの視点調整 ----
@@ -217,16 +223,17 @@ const DEG2RAD = Math.PI / 180;
 // ホーム視点を球面座標（注視点からの距離・仰角）に変換しておく。
 // 無操作が続いた際、水平回転は継続したまま、ズーム・仰角・注視点だけをこの値へなめらかに近づける。
 // 上下方向のランダムな揺れも、この仰角（cameraHomeで指定した見上げ角）を中心に行う。
-const HOME_ORBIT = (() => {
+const HOME_ORBIT = { r: 15, phi: Math.PI / 2 };
+function updateHomeOrbit() {
     const dx = HOME.px - HOME.tx;
     const dy = HOME.py - HOME.ty;
     const dz = HOME.pz - HOME.tz;
-    const r  = Math.sqrt(dx * dx + dy * dy + dz * dz) || 15;
-    return { r, phi: Math.acos(Math.max(-1, Math.min(1, dy / r))) };
-})();
+    HOME_ORBIT.r   = Math.sqrt(dx * dx + dy * dy + dz * dz) || 15;
+    HOME_ORBIT.phi = Math.acos(Math.max(-1, Math.min(1, dy / HOME_ORBIT.r)));
+}
+updateHomeOrbit();
 
 const AUTO_ORBIT = CONFIG.autoOrbit;
-const ORBIT_PHI_CENTER             = HOME_ORBIT.phi;                             // 仰角の基準値（cameraHomeの見上げ角）
 const ORBIT_PHI_RANGE              = (AUTO_ORBIT.verticalRangeDeg / 2) * DEG2RAD; // 仰角の可動範囲（基準値からの片側の振れ幅）
 const ORBIT_THETA_SPEED_MIN        = AUTO_ORBIT.speedMinDeg * DEG2RAD;           // 水平回転速度の最小値（rad/秒）。反復運動に見えないよう常にある程度の速さを保つ
 const ORBIT_THETA_SPEED_MAX        = AUTO_ORBIT.speedMaxDeg * DEG2RAD;           // 水平回転速度の最大値（rad/秒）
@@ -545,8 +552,8 @@ function autoOrbitLoop(timestamp) {
                     orbitPhi += (HOME_ORBIT.phi - orbitPhi) * returnEase;
                     lerpVec(target, HOME.tx, HOME.ty, HOME.tz, returnEase);
                 } else {
-                    const phiMin = Math.max(ORBIT_PHI_ABS_MIN, ORBIT_PHI_CENTER - ORBIT_PHI_RANGE);
-                    const phiMax = Math.min(ORBIT_PHI_ABS_MAX, ORBIT_PHI_CENTER + ORBIT_PHI_RANGE);
+                    const phiMin = Math.max(ORBIT_PHI_ABS_MIN, HOME_ORBIT.phi - ORBIT_PHI_RANGE);
+                    const phiMax = Math.min(ORBIT_PHI_ABS_MAX, HOME_ORBIT.phi + ORBIT_PHI_RANGE);
                     let nextPhi  = orbitPhi + orbitPhiSpeed * dt;
                     if (nextPhi < phiMin || nextPhi > phiMax) {
                         nextPhi = Math.max(phiMin, Math.min(phiMax, nextPhi));
@@ -571,6 +578,7 @@ requestAnimationFrame(autoOrbitLoop);
 
 // ---- 待機状態の開始・終了 ----
 function startIdle() {
+    if (PREVIEW) return; // 管理画面のプレビュー中は、視点を調整しやすいよう自動回転させない
     isIdle         = true;
     idleReturnHome = false;
     orbitTheta     = null; // 現在位置から再初期化してオービット開始
@@ -692,6 +700,57 @@ fsBtn.addEventListener('click', () => {
 
 document.addEventListener('fullscreenchange', updateFsIcon);
 document.addEventListener('webkitfullscreenchange', updateFsIcon);
+
+// ---- 管理画面（<モデル名>/admin）のプレビュー枠から呼ばれるAPI ----
+// 管理画面は同一オリジンの iframe としてこのページを開き、ページを再読み込みせずに
+// 反映できる項目（タイトル・背景色・霧・モデルの配置・初期視野）をここ経由で書き換える。
+// それ以外の項目は、管理画面側が iframe を再読み込みして反映する。
+window.W3DV = {
+    // 現在の視点（カメラ位置と注視点）を cameraHome と同じ形で返す
+    getCamera() {
+        const oc = getOC();
+        if (!oc || !oc.controls) return null;
+        const p = getCamObj(oc).position, t = oc.controls.target;
+        const r = v => Math.round(v * 100) / 100;
+        return { px: r(p.x), py: r(p.y), pz: r(p.z), tx: r(t.x), ty: r(t.y), tz: r(t.z) };
+    },
+
+    goHome() {
+        animateToHome(0.1);
+    },
+
+    applyLive(cfg) {
+        document.title = cfg.pageTitle;
+        const titleEl = document.getElementById('title');
+        titleEl.textContent = '';
+        cfg.displayTitle.forEach((line, i) => {
+            if (i) titleEl.appendChild(document.createElement('br'));
+            titleEl.appendChild(document.createTextNode(line));
+        });
+
+        if (cfg.backgroundType !== 'image') scene.setAttribute('background', `color: ${cfg.backgroundColor}`);
+        scene.setAttribute('fog', `type: linear; color: ${cfg.fogColor}; near: ${cfg.fogNear}; far: ${cfg.fogFar}`);
+
+        const p = cfg.modelPosition, r = cfg.modelRotation, s = cfg.modelScale;
+        modelEntity.setAttribute('position', `${p.x} ${p.y} ${p.z}`);
+        modelEntity.setAttribute('rotation', `${r.x} ${r.y} ${r.z}`);
+        modelEntity.setAttribute('scale', `${s.x} ${s.y} ${s.z}`);
+        Object.assign(baseModelScale, s);
+
+        // 初期視野が変わったときだけ、その視点へカメラを移す
+        const h = cfg.cameraHome;
+        if (['px', 'py', 'pz', 'tx', 'ty', 'tz'].some(k => h[k] !== HOME[k])) {
+            Object.assign(HOME, h);
+            updateHomeOrbit();
+            const oc = getOC();
+            if (oc && oc.controls) {
+                getCamObj(oc).position.set(HOME.px, HOME.py, HOME.pz);
+                oc.controls.target.set(HOME.tx, HOME.ty, HOME.tz);
+                oc.controls.update();
+            }
+        }
+    }
+};
 
 
 // MIT License | github.com/ChikumaTateshina/Web3DViewer
