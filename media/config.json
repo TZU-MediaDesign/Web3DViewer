@@ -1,7 +1,7 @@
 {
   "pageTitle": "3D Model Viewer",
   "displayTitle": ["Sample Model", "3D Model Viewer"],
-  "modelFile": "index.gltf",
+  "modelFile": "SPP.gltf",
   "backgroundType": "color",
   "backgroundColor": "#8FA8BF",
   "fogColor": "#8FA8BF",
