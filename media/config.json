@@ -1,11 +1,104 @@
 {
-  "pageTitle": "3D Model Viewer",
-  "displayTitle": ["Sample Model", "3D Model Viewer"],
+  "pageTitle": "SPP",
+  "displayTitle": [
+    "SPP model"
+  ],
   "modelFile": "SPP.gltf",
+  "modelPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "modelRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "modelScale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+  },
+  "loadingText": "読み込み中...",
+  "cullBackfaces": false,
+  "playAnimations": true,
+  "animationClip": "*",
+  "animationLoop": "repeat",
+  "animationTimeScale": 1,
+  "enableWebVR": true,
+  "enableWebAR": true,
+  "xrCameraPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 5
+  },
+  "enableDeviceOrientation": true,
+  "enableDisplayLock": true,
   "backgroundType": "color",
-  "backgroundColor": "#8FA8BF",
-  "fogColor": "#8FA8BF",
+  "backgroundColor": "#8ebeaf",
+  "backgroundImage": "",
+  "fogColor": "#b1f2be",
   "fogNear": 60,
   "fogFar": 120,
-  "cameraHome": { "px": 20, "py": 20, "pz": 15, "tx": 0, "ty": 2, "tz": 0 }
+  "cameraHome": {
+    "px": 1.87,
+    "py": 2.65,
+    "pz": 0.29,
+    "tx": 0,
+    "ty": 2,
+    "tz": 0
+  },
+  "idleOrbitDelaySec": 30,
+  "idleResetDelaySec": 60,
+  "autoOrbit": {
+    "speedMinDeg": 10,
+    "speedMaxDeg": 45,
+    "verticalRangeDeg": 160,
+    "verticalSpeedMaxDeg": 20
+  },
+  "markerAR": {
+    "enableButton": true,
+    "markerType": "hiro",
+    "patternFile": "",
+    "barcodeValue": 0,
+    "modelPosition": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "modelRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "modelScale": {
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.5
+    }
+  },
+  "imageAR": {
+    "enableButton": true,
+    "descriptorName": "",
+    "modelPosition": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "modelRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "modelScale": {
+      "x": 5,
+      "y": 5,
+      "z": 5
+    }
+  },
+  "arUI": {
+    "showBackButton": true,
+    "showModeSwitchButton": true,
+    "showHint": true
+  }
 }
